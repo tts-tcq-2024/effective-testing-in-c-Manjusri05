@@ -1,21 +1,59 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
-int printColorMap() {
-    const char* majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
-    const char* minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
-    int i = 0, j = 0;
-    for(i = 0; i < 5; i++) {
-        for(j = 0; j < 5; j++) {
-            printf("%d | %s | %s\n", i * 5 + j, majorColor[i], minorColor[i]);
+#define MAJOR_COLOR_COUNT 5
+#define MINOR_COLOR_COUNT 5
+
+const char* majorColor[MAJOR_COLOR_COUNT] = {"White", "Red", "Black", "Yellow", "Violet"};
+const char* minorColor[MINOR_COLOR_COUNT] = {"Blue", "Orange", "Green", "Brown", "Slate"};
+
+typedef struct {
+    int index;
+    const char* major;
+    const char* minor;
+} ColorMapEntry;
+
+// Introduce a bug in this function by using an incorrect index for minorColor
+void generateColorMap(ColorMapEntry colorMap[]) {
+    for (int i = 0; i < MAJOR_COLOR_COUNT; i++) {
+        for (int j = 0; j < MINOR_COLOR_COUNT; j++) {
+            // Intentional bug: Using i instead of j for minorColor
+            colorMap[i * MINOR_COLOR_COUNT + j] = (ColorMapEntry){.index = i * MINOR_COLOR_COUNT + j, .major = majorColor[i], .minor = minorColor[i]};
         }
     }
-    return i * j;
+}
+
+void printColorMap(const ColorMapEntry colorMap[]) {
+    for (int i = 0; i < MAJOR_COLOR_COUNT * MINOR_COLOR_COUNT; i++) {
+        printf("%d | %s | %s\n", colorMap[i].index, colorMap[i].major, colorMap[i].minor);
+    }
+}
+
+void testGenerateColorMap() {
+    ColorMapEntry colorMap[MAJOR_COLOR_COUNT * MINOR_COLOR_COUNT];
+    generateColorMap(colorMap);
+
+    // Check the generated color map for correctness
+    for (int i = 0; i < MAJOR_COLOR_COUNT; i++) {
+        for (int j = 0; j < MINOR_COLOR_COUNT; j++) {
+            int index = i * MINOR_COLOR_COUNT + j;
+            assert(colorMap[index].index == index);
+            assert(strcmp(colorMap[index].major, majorColor[i]) == 0);
+            assert(strcmp(colorMap[index].minor, minorColor[j]) == 0);
+        }
+    }
 }
 
 int main() {
-    int result = printColorMap();
-    assert(result == 25);
-    printf("All is well (maybe!)\n");
+    // Run the test for color map generation
+    testGenerateColorMap();  // This will fail due to the introduced bug
+
+    // Now print the color map
+    ColorMapEntry colorMap[MAJOR_COLOR_COUNT * MINOR_COLOR_COUNT];
+    generateColorMap(colorMap);
+    printColorMap(colorMap);
+    
+    printf("All tests passed (maybe!)\n");
     return 0;
 }
