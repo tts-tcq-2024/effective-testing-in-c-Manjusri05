@@ -14,10 +14,12 @@ typedef struct {
     const char* minor;
 } ColorMapEntry;
 
+// Introduce a bug in this function by using an incorrect index for minorColor
 void generateColorMap(ColorMapEntry colorMap[]) {
     for (int i = 0; i < MAJOR_COLOR_COUNT; i++) {
         for (int j = 0; j < MINOR_COLOR_COUNT; j++) {
-            colorMap[i * MINOR_COLOR_COUNT + j] = (ColorMapEntry){.index = i * MINOR_COLOR_COUNT + j, .major = majorColor[i], .minor = minorColor[j]};
+            // Intentional bug: Using i instead of j for minorColor
+            colorMap[i * MINOR_COLOR_COUNT + j] = (ColorMapEntry){.index = i * MINOR_COLOR_COUNT + j, .major = majorColor[i], .minor = minorColor[i]};
         }
     }
 }
@@ -45,7 +47,7 @@ void testGenerateColorMap() {
 
 int main() {
     // Run the test for color map generation
-    testGenerateColorMap();
+    testGenerateColorMap();  // This will fail due to the introduced bug
 
     // Now print the color map
     ColorMapEntry colorMap[MAJOR_COLOR_COUNT * MINOR_COLOR_COUNT];
